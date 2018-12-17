@@ -45,20 +45,21 @@ int main(int argc, char **argv)
 
     // Audio recorder
     WaveRecorder recorder(1, emulator.apu().sampleRate(), "sound.wav");
-    QObject::connect(&emulator.apu(), &Apu::sampleFinished, &recorder, &WaveRecorder::addSample);
+    QObject::connect(&emulator.apu(), &Apu::samplesFinished, &recorder, &WaveRecorder::addSamples);
 
     // Live audio playback
     FifoStream stream;
-    QObject::connect(&emulator.apu(), &Apu::sampleFinished, [&stream](qint32 sample){
+    QObject::connect(&emulator.apu(), &Apu::samplesFinished, [&stream](const QVector<qint32> &samples){
         QByteArray buf;
-        buf.reserve(sizeof(qint32));
+        buf.reserve(samples.size() * sizeof(qint32));
 
         QDataStream dataStream(&buf, QIODevice::WriteOnly);
         dataStream.setByteOrder(QDataStream::BigEndian);
 
-        dataStream << sample;
+        for(auto sample : samples)
+            dataStream << sample;
 
-        Q_ASSERT(buf.size() == sizeof(qint32));
+        Q_ASSERT(buf.size() == samples.size() * sizeof(qint32));
 
         stream.write(buf);
     });

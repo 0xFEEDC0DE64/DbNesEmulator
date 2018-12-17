@@ -468,7 +468,7 @@ void Apu::updatePlayback()
         audioDcY = m_lowPassFilter.doFiltering(audioDcY);// 14 KHz
         audioDcY = std::clamp(audioDcY, double(-EmuSettings::Audio::internalPeekLimit), double(EmuSettings::Audio::internalPeekLimit));
 
-        Q_EMIT sampleFinished(audioDcY);
+        m_samples.append(audioDcY);
 
         m_audioY = 0;
         m_audioYClocks = 0;
@@ -499,9 +499,11 @@ void Apu::readState(QDataStream &dataStream)
     m_dmc.apuDmcReadState(dataStream);
 }
 
-void Apu::setTimer(double timer)
+void Apu::flush()
 {
-    m_timer = timer;
+    m_timer = 0;
+    Q_EMIT samplesFinished(m_samples);
+    m_samples.clear();
 }
 
 bool Apu::oddCycle() const

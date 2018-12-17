@@ -178,6 +178,6 @@ const Ppu &NesEmulator::ppu() const
 
 void NesEmulator::frameFinished()
 {
-    m_apu.setTimer(0.);
+    m_apu.flush();
     m_frameFinished = true;
 }

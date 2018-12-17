@@ -56,7 +56,7 @@ public:
     void writeState(QDataStream &dataStream) const;
     void readState(QDataStream &dataStream);
 
-    void setTimer(double timer);
+    void flush();
 
     bool oddCycle() const;
 
@@ -92,7 +92,7 @@ public:
     static const std::array<quint8, 32> m_sqDurationTable;
 
 Q_SIGNALS:
-    void sampleFinished(qint32 sample);
+    void samplesFinished(const QVector<qint32> &samples);
 
 private:
     NesEmulator &m_emu;
@@ -145,5 +145,6 @@ private:
 
     bool m_inputStrobe {};
 
+    QVector<qint32> m_samples;
     qint32 m_sampleRate { 44100 };
 };
