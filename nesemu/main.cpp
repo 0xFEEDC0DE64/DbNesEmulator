@@ -5,6 +5,8 @@
 #include <QDataStream>
 #include <QImage>
 #include <QFile>
+#include <QTableView>
+#include <QHeaderView>
 #include <QTimer>
 #include <QAudioFormat>
 #include <QAudioDeviceInfo>
@@ -21,6 +23,9 @@
 // nescorelib includes
 #include "nesemulator.h"
 #include "emusettings.h"
+
+// local includes
+#include "memorymodel.h"
 
 int main(int argc, char **argv)
 {
@@ -102,6 +107,23 @@ int main(int argc, char **argv)
 
         dataStream << frame;
     });
+
+    MemoryModel model(emulator);
+    QObject::connect(&emulator.ppu(), &Ppu::frameFinished, &model, &MemoryModel::refresh);
+
+    QTableView tableView;
+    {
+        QHeaderView *horizontalHeader = tableView.horizontalHeader();
+        horizontalHeader->setSectionResizeMode(QHeaderView::Fixed);
+        horizontalHeader->setDefaultSectionSize(0);
+    }
+    {
+        QHeaderView *verticalHeader = tableView.verticalHeader();
+        verticalHeader->setSectionResizeMode(QHeaderView::Fixed);
+        verticalHeader->setDefaultSectionSize(0);
+    }
+    tableView.setModel(&model);
+    tableView.show();
 
     QTimer timer;
     QObject::connect(&timer, &QTimer::timeout, &emulator, &NesEmulator::emuClockFrame);

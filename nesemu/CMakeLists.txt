@@ -5,10 +5,12 @@ find_package(Qt5Multimedia CONFIG REQUIRED)
 find_package(Qt5Gamepad CONFIG REQUIRED)
 
 set(HEADERS
+    memorymodel.h
 )
 
 set(SOURCES
     main.cpp
+    memorymodel.cpp
 )
 
 add_executable(nesemu ${HEADERS} ${SOURCES})
